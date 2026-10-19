@@ -145,3 +145,14 @@ a:hover, .note-link.active {
     border-bottom: 1px solid var(--border);
   }
 }
+
+.note-group {
+  margin: 18px 0 6px;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.katex { font-size: 1.05em; }
+.document .katex-display { overflow-x: auto; overflow-y: hidden; }
