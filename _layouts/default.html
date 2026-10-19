@@ -253,6 +253,19 @@
           first.nodeValue = first.nodeValue.slice(2); nxt.nodeValue = nxt.nodeValue.slice(2);
         }
       });
+      // kramdown can split "****a**** b" across two <strong> in one block: leading ** in one, trailing ** in another.
+      root.querySelectorAll('p, li, td, th, h1, h2, h3, h4, h5, h6').forEach(function (blk) {
+        var lead = [], trail = [];
+        blk.querySelectorAll('strong, em').forEach(function (el) {
+          if (el.closest('pre, code, .katex') || el.parentNode.closest('strong, em')) return;
+          if (el.firstChild && el.firstChild.nodeType === 3 && /^\*\*/.test(el.firstChild.nodeValue)) lead.push(el.firstChild);
+          if (el.lastChild && el.lastChild.nodeType === 3 && /\*\*\s*$/.test(el.lastChild.nodeValue)) trail.push(el.lastChild);
+        });
+        if (lead.length && lead.length === trail.length) {
+          lead.forEach(function (t) { t.nodeValue = t.nodeValue.replace(/^\*\*/, ''); });
+          trail.forEach(function (t) { t.nodeValue = t.nodeValue.replace(/\*\*(\s*)$/, '$1'); });
+        }
+      });
       var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
       var nodes = [], n;
       while ((n = walker.nextNode())) {
