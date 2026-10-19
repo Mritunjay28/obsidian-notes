@@ -156,3 +156,50 @@ a:hover, .note-link.active {
 
 .katex { font-size: 1.05em; }
 .document .katex-display { overflow-x: auto; overflow-y: hidden; }
+
+/* Top-bar menus (DSA / Other) replace the left sidebar */
+.workspace { grid-template-columns: minmax(0, 1fr) 230px; }
+.sidebar { display: none !important; }
+.main-nav { align-items: center; }
+.main-nav > a.active { color: var(--accent); }
+.menu { position: relative; }
+.menu-btn {
+  background: none;
+  border: 0;
+  padding: 8px 4px;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+}
+.menu-btn:hover, .menu.open .menu-btn, .menu.has-active .menu-btn { color: var(--accent); }
+.caret { font-size: 0.8em; }
+.menu-list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 8px 16px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 20;
+}
+.menu.open .menu-list { display: block; }
+.menu-list .note-link { white-space: nowrap; font-weight: 400; }
+
+@media (max-width: 1000px) {
+  .workspace { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 650px) {
+  .topbar { gap: 12px; overflow: visible; padding: 0 12px; }
+  .brand { font-size: 15px; }
+  .topbar nav { gap: 12px; }
+  .menu { position: static; }
+  .menu-list { left: 0; right: 0; top: 100%; border-radius: 0; min-width: 0; }
+}
