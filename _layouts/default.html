@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page.title | default: site.title }}</title>
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ '/' | relative_url }}">
+      {{ site.title }}
+    </a>
+    <nav>
+      <a href="{{ '/content/' | relative_url }}">DSA</a>
+      <a href="{{ '/content/' | relative_url }}">ML</a>
+      <a href="{{ '/content/' | relative_url }}">System Design</a>
+      <a href="{{ '/content/' | relative_url }}">Research</a>
+    </nav>
+  </header>
+
+  <div class="workspace">
+    <aside class="sidebar">
+      <h2>All Posts</h2>
+      {% assign notes = site.pages | sort: "title" %}
+      {% for note in notes %}
+        {% if note.title and note.url != "/" %}
+          <a class="note-link" href="{{ note.url | relative_url }}">
+            {{ note.title }}
+          </a>
+        {% endif %}
+      {% endfor %}
+    </aside>
+
+    <main class="document">
+      <h1>{{ page.title | default: site.title }}</h1>
+      {{ content }}
+    </main>
+
+    <aside class="toc">
+      <h3>On this page</h3>
+      {% if page.toc %}
+        {% for item in page.toc %}
+          <a href="#{{ item.id }}">{{ item.title }}</a>
+        {% endfor %}
+      {% else %}
+        <p>Page sections</p>
+      {% endif %}
+    </aside>
+  </div>
+</body>
+</html>
