@@ -11,6 +11,7 @@ title: Home
 (function () {
   var el = document.getElementById('notes-index');
   var grid = document.getElementById('card-grid');
+  var touchOnly = window.matchMedia && window.matchMedia('(hover: none)').matches;
   if (!el || !grid) return;
   var notes = JSON.parse(el.textContent);
   var order = ["DSA", "OOPs", "DBMS", "SQL", "System Design"];
@@ -46,6 +47,16 @@ title: Home
       }
       var pl = document.createElement('span'); pl.className = 'plink'; pl.textContent = n.t; prev.appendChild(pl);
     });
+    if (touchOnly) {
+      a.addEventListener('click', function (e) {
+        if (!a.classList.contains('show-preview')) {
+          e.preventDefault();
+          var open = document.querySelectorAll('a.card.show-preview');
+          for (var i = 0; i < open.length; i++) open[i].classList.remove('show-preview');
+          a.classList.add('show-preview');
+        }
+      });
+    }
     a.appendChild(h); a.appendChild(c); a.appendChild(prev);
     grid.appendChild(a);
   });
