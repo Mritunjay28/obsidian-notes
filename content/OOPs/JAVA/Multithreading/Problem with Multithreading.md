@@ -5,6 +5,7 @@ share: true
 - **Shared Resource:** Any data, variable, memory location, or object shared and accessed simultaneously across multiple threads (e.g., an object field, an in-memory list, or an account balance).
 - **Critical Section:** The specific block of code that accesses and mutates a shared resource; if multiple threads execute this section concurrently without protection, data corruption can occur
 - **Thread Interference:** Bugs and data inconsistencies introduced when concurrent threads overlap operations on shared resources, breaking correctness.
+
 ### **1. Race Conditions & The Atomicity Problem**
 #### **What is a Race Condition?**
 A **race condition** occurs when a program’s final state depends unpredictably on the non-deterministic scheduling, context switching, or order of thread execution.
@@ -33,6 +34,7 @@ Thread 1 (T1)                      Thread 2 (T2)                      Memory (co
 - Even though both threads incremented `count`, the final value is `1` instead of `2` because T1 overwrote T2's write with a stale read.
 - The same lost-update issue occurs on multi-core systems when threads run in true physical parallelism, as both cores read `0` simultaneously from memory before writing back `1`.
 - In practice, running two threads incrementing a shared counter 10,000 times each results in non-deterministic final totals significantly below 20,000 (e.g., 12,109 or 19,669).
+
 #### **Atomic vs. Non-Atomic Examples**
 - **Atomic Operations:**
     - Simple variable assignments (e.g., `int x = 2;`).
@@ -42,6 +44,7 @@ Thread 1 (T1)                      Thread 2 (T2)                      Memory (co
     - Compound assignments (`x += 5` or `x = x + 5`).
     - **Check-Then-Act operations:** Conditionals where an action depends on a prior check (e.g., `if (balance &gt;= amount) { balance -= amount; }`). If a context switch occurs after the check passes, another thread can alter the state, causing invalid actions such as account balances dropping into negative values.
     - **64-bit Writes on 32-bit JVMs (Edge Case):** 64-bit data types (`double`, `long`) can be written in two separate 32-bit operations by some JVMs, leaving them non-atomic unless declared `volatile` or synchronized.
+
 ### **2. The Visibility Problem**
 #### **Definition & Hardware Cause**
 **Visibility** occurs when one thread modifies a shared variable, but the updated value remains **invisible** to other threads.
@@ -65,6 +68,7 @@ Thread 1 (T1)                      Thread 2 (T2)                      Memory (co
 
 ```
 #### **Code Demonstration**
+
 ```
 static boolean flag = false;
 
@@ -85,12 +89,15 @@ new Thread(() -> {
 - **Why** **System.out.println** **masks visibility:** Adding a print statement inside the `while` loop makes the loop terminate because `System.out.println()` internally uses synchronization, which forces CPU cache flushes.
 - **The** **volatile** **Solution:** Declaring `static volatile boolean flag = false;` guarantees visibility by forcing every read and write to bypass CPU caches and interact directly with main RAM.
 - **Important Distinction:** `volatile` **does not** solve race conditions or atomicity A `volatile int count = 0;` still suffers from race conditions during `count++` because it does not prevent interleaved multi-step execution.
+
 ### **3. The Ordering Problem (Instruction Reordering)**
 #### **Definition & Root Cause**
 **Instruction Reordering** refers to the compiler and CPU reordering program instructions to optimize execution pipelines and performance.
 - **Single-Thread Guarantee (As-If-Serial):** The compiler and CPU only guarantee that reordering will not alter the outcome of a **single-threaded** execution.
 - **Multi-Thread Failure:** The runtime does not evaluate dependencies across threads.
+
 #### **Reordering Failure Scenario**
+
 ```
 // Initial values: x = 0, flag = false
 
@@ -108,6 +115,7 @@ if (flag) {
 - **Reordered Execution:** Because `x = 10` and `flag = true` are independent, the compiler or CPU may execute `flag = true` first.
 - If a context switch occurs right after `flag = true`, Thread 2 checks `flag`, finds it `true`, and prints `x = 0` (the default/un-updated value).
 - These bugs are non-deterministic, making them difficult to reproduce or debug in production.
+
 ### **Summary: Problems vs. Solutions**
 
 | Problem                            | Root Cause                                                                                                      | Symptom                                                                                   | Fixed By                                                                                                                               |
