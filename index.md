@@ -13,6 +13,7 @@ title: Home
 {%- assign group = parts[1] -%}
 {%- assign sub = "" -%}
 {%- if parts.size > 3 -%}{%- assign sub_index = parts.size | minus: 2 -%}{%- assign sub = parts[sub_index] -%}{%- endif -%}
+{%- if sub == "SQL" -%}{%- assign group = "SQL" -%}{%- assign sub = "" -%}{%- endif -%}{%- if sub == group -%}{%- assign sub = "" -%}{%- endif -%}
 {%- if group != last_group -%}
 {%- if last_group != "" -%}</ul>{%- endif -%}
 <h2>{% if group.size <= 4 %}{{ group | upcase }}{% else %}{{ group | capitalize }}{% endif %}</h2>
