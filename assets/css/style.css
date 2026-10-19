@@ -158,7 +158,7 @@ a:hover, .note-link.active {
 .document .katex-display { overflow-x: auto; overflow-y: hidden; }
 
 /* Top-bar menus replace the left sidebar; note column centered */
-.workspace { grid-template-columns: minmax(0, 860px) 230px; justify-content: center; gap: 28px; }
+.workspace { grid-template-columns: minmax(0, var(--doc-w, 860px)) 230px; justify-content: center; gap: 28px; }
 .sidebar { display: none !important; }
 .main-nav { align-items: center; }
 .main-nav > a.active { color: var(--accent); }
@@ -194,6 +194,7 @@ a:hover, .note-link.active {
 
 @media (max-width: 1000px) {
   .workspace { grid-template-columns: minmax(0, 860px); }
+  .toc-resizer { display: none; }
 }
 
 @media (max-width: 650px) {
@@ -294,3 +295,13 @@ a.card:hover .preview, a.card:focus-within .preview, a.card.show-preview .previe
 .topics-page .back-link:hover { color: var(--accent); }
 .topics-page .home-list li { padding: 7px 0; }
 .topics-page a.topic-row { display: block; padding: 8px 0; }
+
+/* Draggable divider beside "On this page" */
+.toc { position: sticky; }
+.toc-resizer {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 10px;
+  cursor: col-resize; touch-action: none; z-index: 5;
+}
+.toc-resizer:hover, body.resizing .toc-resizer { background: rgba(138, 180, 248, 0.35); }
+body.resizing { user-select: none; cursor: col-resize; }
+.workspace.is-home .toc-resizer { display: none; }
