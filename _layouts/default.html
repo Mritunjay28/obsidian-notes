@@ -120,6 +120,17 @@
         });
         return best;
       }
+      // A standalone embed line "![[a.png|a.png]]" is parsed as a one-row table because of the "|".
+      // Put the original text back so the embed pass below can handle it.
+      root.querySelectorAll('table').forEach(function (t) {
+        var cells = Array.prototype.map.call(t.querySelectorAll('td, th'), function (c) { return c.textContent; });
+        var joined = cells.join('|').trim();
+        if (/^!\[\[[^\]]*\]\]$/.test(joined) && t.querySelectorAll('tr').length === 1) {
+          var p = document.createElement('p');
+          p.textContent = joined;
+          t.parentNode.replaceChild(p, t);
+        }
+      });
       // Obsidian embeds: ![[file.png]] or ![[file.png|alt]] (images and PDFs).
       var re = /!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/g;
       var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
