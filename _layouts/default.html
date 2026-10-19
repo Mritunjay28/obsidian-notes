@@ -243,7 +243,16 @@
     (function () {
       var root = document.querySelector('.document');
       if (!root) return;
-      var isDbms = location.pathname.indexOf('/content/DBMS/') !== -1;
+      // Malformed emphasis from "****text****" in the source: <strong>**text</strong>** and similar.
+      root.querySelectorAll('strong, em').forEach(function (el) {
+        if (el.closest('pre, code, .katex')) return;
+        var first = el.firstChild, nxt = el.nextSibling;
+        if (el.textContent === '**' ) { el.remove(); return; }
+        if (first && first.nodeType === 3 && first.nodeValue.indexOf('**') === 0 &&
+            nxt && nxt.nodeType === 3 && nxt.nodeValue.indexOf('**') === 0) {
+          first.nodeValue = first.nodeValue.slice(2); nxt.nodeValue = nxt.nodeValue.slice(2);
+        }
+      });
       var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
       var nodes = [], n;
       while ((n = walker.nextNode())) {
@@ -252,7 +261,6 @@
       }
       nodes.forEach(function (t) {
         var v = t.nodeValue;
-        if (isDbms && v.indexOf('**') !== -1) { v = v.replace(/\*{2,}/g, ''); t.nodeValue = v; }
         if (v.indexOf('==') === -1) return;
         var re = /==([^=\n][^\n]*?)==/g, m, last = 0, frag = document.createDocumentFragment(), hit = false;
         while ((m = re.exec(v))) {
