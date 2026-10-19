@@ -41,7 +41,7 @@
     </nav>
   </header>
 
-  <div class="workspace">
+  <div class="workspace{% if page.url == '/' %} is-home{% endif %}">
     <main class="document">
       {% if is_note %}<h1 class="note-title">{{ page_title | escape }}</h1>{% endif %}
       {{ content }}
