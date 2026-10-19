@@ -7,6 +7,7 @@ share: true
 - **Mechanism:** Create a custom class that inherits from `java.lang.Thread` and override its `public void run()` method.
 - **Execution Logic:** The `run()` method contains the code and task that the thread should execute.
 - **Instantiation & Starting:** Instantiate the custom class and call its `.start()` method.
+
 ```
 class MyThread extends Thread {
     @Override
@@ -27,6 +28,7 @@ public class Main {
 - **Mechanism:** Create a class that implements the `java.lang.Runnable` interface and provides an implementation for the abstract `public void run()` method.
 - **Underlying Architecture:** The built-in `Thread` class in Java itself implements the `Runnable` interface internally.
 - **Instantiation & Starting:** Instantiate your `Runnable` implementation, pass that instance into the constructor of a `Thread` object (`new Thread(task)`), and call `.start()` on the thread object.
+
 ```
 class MyRunnable implements Runnable {
     @Override
@@ -47,6 +49,7 @@ public class Main {
 3. **Using Lambda Expressions**
 - **Functional Interface:** Because `Runnable` contains only one abstract method (`run()`), it qualifies as a **functional interface**.
 - **Concise Syntax:** Rather than declaring a separate class or using anonymous inner classes, developers can pass an inline lambda expression directly to the `Thread` constructor.
+
 ```
 Thread t1 = new Thread(() -&gt; {
     System.out.println("Thread is running via Lambda");
@@ -67,6 +70,7 @@ Industry best practice consistently favors implementing `Runnable` over extendin
 
 ### **3. Internal Mechanics: `start()` vs. `run()`**
 Understanding the boundary between JVM instructions and Operating System scheduling is critical for multithreaded programming.
+
 ```
 t1.start()  ──► JVM asks OS to spawn Thread ──► OS assigns Stack &amp; PC ──► Thread executes run() asynchronously
 t1.run()    ──► Normal synchronous method call executed directly on current thread (e.g., main)
@@ -76,9 +80,11 @@ t1.run()    ──► Normal synchronous method call executed directly on curren
 2. **Memory Allocation:** The OS provisions dedicated resources for the new thread, including its own **private Stack** and a **Program Counter (PC) register**.
 3. **Queue Placement:** The thread is placed into the CPU scheduler queue.
 4. **Asynchronous Execution:** When assigned CPU time, the thread invokes the target `run()` method concurrently with the caller thread.
+
 #### **What Happens If You Call `.run()` Directly?**
 - Calling `t1.run()` executes `run()` as a **standard synchronous method call** on the calling thread (such as the `main` thread).
 - The OS creates no new thread, allocates no independent stack or program counter, and code executes sequentially within the existing thread context.
+
 #### **Can a Thread Be Started Twice?**
 - **No.** Calling `.start()` more than once on the same `Thread` instance throws an `IllegalThreadStateException`.
 - Once a thread initiates and completes its lifecycle, it cannot be restarted or reused.
@@ -92,6 +98,7 @@ t1.run()    ──► Normal synchronous method call executed directly on curren
 
 #### **Why Thread Execution is Non-Deterministic**
 When multiple threads (e.g., one printing even numbers and another printing odd numbers) are started concurrently, their console output interleaves unpredictably across executions.
+
 ```
 Run 1: T1(2) -&gt; T1(4) -&gt; T2(1) -&gt; T2(3) -&gt; T1(6) -&gt; T2(5)
 Run 2: T2(1) -&gt; T2(3) -&gt; T2(5) -&gt; T1(2) -&gt; T1(4) -&gt; T2(7)
