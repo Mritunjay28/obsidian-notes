@@ -18,14 +18,22 @@
     <nav class="main-nav" aria-label="Main navigation">
       <a class="nav-home{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">Home</a>
       {% assign last_group = "" %}
+      {% assign last_sub = "" %}
       {% for n in notes %}
         {% assign parts = n.path | split: "/" %}
-        {% if parts.size > 3 or parts.size == 3 %}
+        {% if parts.size > 2 %}
           {% assign group = parts[1] %}
+          {% assign sub = "" %}
+          {% if parts.size > 3 %}{% assign sub_index = parts.size | minus: 2 %}{% assign sub = parts[sub_index] %}{% endif %}
           {% if group != last_group %}
             {% if last_group != "" %}</div></div>{% endif %}
             <div class="menu"><button type="button" class="menu-btn" aria-expanded="false">{% if group.size <= 4 %}{{ group | upcase | escape }}{% else %}{{ group | capitalize | escape }}{% endif %} <span class="caret">&#9662;</span></button><div class="menu-list">
             {% assign last_group = group %}
+            {% assign last_sub = "" %}
+          {% endif %}
+          {% if sub != last_sub %}
+            {% if sub != "" %}<span class="menu-sub">{{ sub | escape }}</span>{% endif %}
+            {% assign last_sub = sub %}
           {% endif %}
           <a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>
         {% endif %}
@@ -55,6 +63,24 @@
 
   <script>
     (function () {
+      // Natural order (LEC-2 before LEC-11) inside each menu section.
+      function byName(a, b) {
+        return a.textContent.trim().localeCompare(b.textContent.trim(), undefined, { numeric: true, sensitivity: 'base' });
+      }
+      function naturalSort(container, labelSel) {
+        var sections = [], cur = [];
+        Array.prototype.slice.call(container.children).forEach(function (el) {
+          if (labelSel && el.matches(labelSel)) { sections.push(cur); cur = [el]; } else cur.push(el);
+        });
+        sections.push(cur);
+        sections.forEach(function (sec) {
+          var hasHead = sec.length && labelSel && sec[0].matches(labelSel);
+          var head = hasHead ? [sec[0]] : [];
+          head.concat(sec.slice(head.length).sort(byName)).forEach(function (el) { container.appendChild(el); });
+        });
+      }
+      document.querySelectorAll('.menu-list').forEach(function (l) { naturalSort(l, '.menu-sub'); });
+      document.querySelectorAll('.home-list').forEach(function (l) { naturalSort(l, null); });
       var menus = document.querySelectorAll('.menu');
       function closeAll(except) {
         menus.forEach(function (m) {
@@ -72,6 +98,61 @@
       });
       document.addEventListener('click', function () { closeAll(null); });
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(null); });
+    })();
+  </script>
+  <script id="attachment-map" type="application/json">[{% assign first = true %}{% for f in site.static_files %}{% if f.path contains '/content/' %}{% assign ext = f.extname | downcase %}{% if ext == '.png' or ext == '.jpg' or ext == '.jpeg' or ext == '.gif' or ext == '.svg' or ext == '.webp' or ext == '.pdf' %}{% unless first %},{% endunless %}{% assign first = false %}{"n":{{ f.name | jsonify }},"u":{{ f.path | relative_url | jsonify }}}{% endif %}{% endif %}{% endfor %}]</script>
+  <script>
+    (function () {
+      var root = document.querySelector('.document');
+      var mapEl = document.getElementById('attachment-map');
+      if (!root || !mapEl) return;
+      var files = {};
+      JSON.parse(mapEl.textContent).forEach(function (f) { (files[f.n] = files[f.n] || []).push(f.u); });
+      var here = decodeURIComponent(location.pathname);
+      function pick(name) {
+        var c = files[name];
+        if (!c) return null;
+        var best = c[0], bestScore = -1;
+        c.forEach(function (u) {
+          var a = decodeURIComponent(u), i = 0;
+          while (i < a.length && i < here.length && a[i] === here[i]) i++;
+          if (i > bestScore) { bestScore = i; best = u; }
+        });
+        return best;
+      }
+      // Obsidian embeds: ![[file.png]] or ![[file.png|alt]] (images and PDFs).
+      var re = /!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/g;
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (n) {
+          return !n.parentNode.closest('CODE, PRE, SCRIPT, STYLE') && n.nodeValue.indexOf('![[') > -1
+            ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      var nodes = [], n;
+      while ((n = walker.nextNode())) nodes.push(n);
+      nodes.forEach(function (node) {
+        var text = node.nodeValue, frag = document.createDocumentFragment(), last = 0, m;
+        re.lastIndex = 0;
+        while ((m = re.exec(text))) {
+          frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+          var name = m[1].trim(), url = pick(name), el;
+          if (!url) {
+            el = document.createElement('span');
+            el.className = 'embed-missing';
+            el.textContent = 'Image not available: ' + name;
+          } else if (/\.pdf$/i.test(name)) {
+            el = document.createElement('a');
+            el.href = url; el.textContent = name; el.target = '_blank'; el.rel = 'noopener';
+          } else {
+            el = document.createElement('img');
+            el.src = url; el.alt = (m[2] || name).trim(); el.loading = 'lazy';
+          }
+          frag.appendChild(el);
+          last = m.index + m[0].length;
+        }
+        frag.appendChild(document.createTextNode(text.slice(last)));
+        node.parentNode.replaceChild(frag, node);
+      });
     })();
   </script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
