@@ -6,6 +6,9 @@ baseurl: "/obsidian-notes"
 
 theme: minima
 markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: true
 permalink: pretty
 
 include:
