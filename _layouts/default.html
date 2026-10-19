@@ -25,6 +25,7 @@
           {% assign group = parts[1] %}
           {% assign sub = "" %}
           {% if parts.size > 3 %}{% assign sub_index = parts.size | minus: 2 %}{% assign sub = parts[sub_index] %}{% endif %}
+          {% if sub == "SQL" %}{% assign group = "SQL" %}{% assign sub = "" %}{% endif %}{% if sub == group %}{% assign sub = "" %}{% endif %}
           {% if group != last_group %}
             {% if last_group != "" %}</div></div>{% endif %}
             <div class="menu"><button type="button" class="menu-btn" aria-expanded="false">{% if group.size <= 4 %}{{ group | upcase | escape }}{% else %}{{ group | capitalize | escape }}{% endif %} <span class="caret">&#9662;</span></button><div class="menu-list">
@@ -234,6 +235,35 @@
         a.href = '#' + h.id;
         a.textContent = h.textContent;
         list.appendChild(a);
+      });
+    })();
+  </script>
+  <script>
+    // Obsidian ==highlight== and stray **** markers (display only, notes are not changed).
+    (function () {
+      var root = document.querySelector('.document');
+      if (!root) return;
+      var isDbms = location.pathname.indexOf('/content/DBMS/') !== -1;
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+      var nodes = [], n;
+      while ((n = walker.nextNode())) {
+        if (n.parentNode.closest('pre, code, .katex, script, style')) continue;
+        nodes.push(n);
+      }
+      nodes.forEach(function (t) {
+        var v = t.nodeValue;
+        if (isDbms && v.indexOf('**') !== -1) { v = v.replace(/\*{2,}/g, ''); t.nodeValue = v; }
+        if (v.indexOf('==') === -1) return;
+        var re = /==([^=\n][^\n]*?)==/g, m, last = 0, frag = document.createDocumentFragment(), hit = false;
+        while ((m = re.exec(v))) {
+          hit = true;
+          frag.appendChild(document.createTextNode(v.slice(last, m.index)));
+          var mk = document.createElement('mark'); mk.textContent = m[1]; frag.appendChild(mk);
+          last = re.lastIndex;
+        }
+        if (!hit) return;
+        frag.appendChild(document.createTextNode(v.slice(last)));
+        t.parentNode.replaceChild(frag, t);
       });
     })();
   </script>
