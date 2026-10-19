@@ -13,31 +13,36 @@
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 </head>
 <body>
+  {% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "path" %}
   <header class="topbar">
     <a class="brand" href="{{ '/' | relative_url }}">{{ site.title | escape }}</a>
-    <nav aria-label="Main navigation">
-      <a href="{{ '/' | relative_url }}">Home</a>
-      <a href="{{ '/#all-notes' | relative_url }}">All Notes</a>
+    <nav class="main-nav" aria-label="Main navigation">
+      <a class="nav-home{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">Home</a>
+      {% assign last_group = "" %}
+      {% for n in notes %}
+        {% assign parts = n.path | split: "/" %}
+        {% if parts.size > 3 or parts.size == 3 %}
+          {% assign group = parts[1] %}
+          {% if group != last_group %}
+            {% if last_group != "" %}</div></div>{% endif %}
+            <div class="menu"><button type="button" class="menu-btn" aria-expanded="false">{% if group.size <= 4 %}{{ group | upcase | escape }}{% else %}{{ group | capitalize | escape }}{% endif %} <span class="caret">&#9662;</span></button><div class="menu-list">
+            {% assign last_group = group %}
+          {% endif %}
+          <a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if last_group != "" %}</div></div>{% endif %}
+      {% assign other_count = 0 %}
+      {% for n in notes %}{% assign parts = n.path | split: "/" %}{% if parts.size == 2 %}{% assign other_count = other_count | plus: 1 %}{% endif %}{% endfor %}
+      {% if other_count > 0 %}
+        <div class="menu"><button type="button" class="menu-btn" aria-expanded="false">Others <span class="caret">&#9662;</span></button><div class="menu-list">
+          {% for n in notes %}{% assign parts = n.path | split: "/" %}{% if parts.size == 2 %}<a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>{% endif %}{% endfor %}
+        </div></div>
+      {% endif %}
     </nav>
   </header>
 
   <div class="workspace">
-    <aside class="sidebar">
-      <h2>All Notes</h2>
-      <a class="note-link{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">Home</a>
-      {% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "path" %}
-      {% assign last_group = "" %}
-      {% for n in notes %}
-        {% assign parts = n.path | split: "/" %}
-        {% if parts.size > 2 %}{% assign group = parts[1] %}{% else %}{% assign group = "Other" %}{% endif %}
-        {% if group != last_group %}
-          <h3 class="note-group">{% if group.size <= 4 %}{{ group | upcase | escape }}{% else %}{{ group | capitalize | escape }}{% endif %}</h3>
-          {% assign last_group = group %}
-        {% endif %}
-        <a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>
-      {% endfor %}
-    </aside>
-
     <main class="document">
       {% if is_note %}<h1 class="note-title">{{ page_title | escape }}</h1>{% endif %}
       {{ content }}
@@ -49,6 +54,27 @@
     </aside>
   </div>
 
+  <script>
+    (function () {
+      var menus = document.querySelectorAll('.menu');
+      function closeAll(except) {
+        menus.forEach(function (m) {
+          if (m !== except) { m.classList.remove('open'); m.querySelector('.menu-btn').setAttribute('aria-expanded', 'false'); }
+        });
+      }
+      menus.forEach(function (m) {
+        if (m.querySelector('.note-link.active')) m.classList.add('has-active');
+        m.querySelector('.menu-btn').addEventListener('click', function (e) {
+          e.stopPropagation();
+          closeAll(m);
+          var open = m.classList.toggle('open');
+          this.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+      });
+      document.addEventListener('click', function () { closeAll(null); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(null); });
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
   <script>
