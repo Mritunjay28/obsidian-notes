@@ -13,7 +13,7 @@ Welcome to my public knowledge base.
 {% assign last_group = "" %}
 {% for n in notes %}
 {% assign parts = n.path | split: "/" %}
-{% if parts.size > 2 %}{% assign group = parts[1] %}{% else %}{% assign group = "Other" %}{% endif %}
+{% if parts.size > 2 %}{% assign group = parts[1] %}{% else %}{% assign group = "Others" %}{% endif %}
 {% if group != last_group %}
 
 ### {% if group.size <= 4 %}{{ group | upcase }}{% else %}{{ group | capitalize }}{% endif %}
