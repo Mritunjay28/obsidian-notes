@@ -22,7 +22,9 @@ An **immutable** object **cannot be changed** after it is created. Any “modifi
 | Thread-safe?         | ✅ Yes (mostly)                 | ❌ Not by default             |
 | Used in HashMap key? | ✅ Good choice (fixed hashcode) | ❌ Risky                      |
 | Example              | `String`, `Integer`            | `StringBuilder`, `ArrayList` |
+
 example :
+
 ```
 ## Immutable
 public class TestImmutable {
@@ -60,6 +62,7 @@ rules for above :
 - All fields should be `private final`
 - No setters
 - No method should expose mutable references
+
 ```
 final class Person { // class final
     private final String name; // fields final
