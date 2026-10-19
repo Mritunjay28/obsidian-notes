@@ -1,60 +1,61 @@
-
 ---
 ---
+{% assign is_note = false %}
+{% if page.path contains 'content/' %}{% assign is_note = true %}{% endif %}
+{% if is_note %}{% assign page_title = page.name | remove: ".md" %}{% else %}{% assign page_title = page.title | default: site.title %}{% endif %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ page.title | default: site.title | escape }}</title>
+  <title>{{ page_title | escape }}{% if page.url != "/" %} | {{ site.title | escape }}{% endif %}</title>
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="{{ '/' | relative_url }}">
-      {{ site.title | escape }}
-    </a>
+    <a class="brand" href="{{ '/' | relative_url }}">{{ site.title | escape }}</a>
     <nav aria-label="Main navigation">
       <a href="{{ '/' | relative_url }}">Home</a>
-      <a href="{{ '/#all-notes' | relative_url }}">DSA / All Notes</a>
+      <a href="{{ '/#all-notes' | relative_url }}">All Notes</a>
     </nav>
   </header>
 
   <div class="workspace">
     <aside class="sidebar">
       <h2>All Notes</h2>
-
-      <a class="note-link" href="{{ '/' | relative_url }}">Home</a>
-
-      {% assign notes = site.pages | sort: "title" %}
-      {% for note in notes %}
-        {% if note.title and note.url != "/" and note.url != "/404.html" %}
-          <a class="note-link" href="{{ note.url | relative_url }}">
-            {{ note.title | escape }}
-          </a>
-        {% endif %}
-      {% endfor %}
-
-      {% assign files = site.static_files | sort: "name" %}
-      {% for file in files %}
-        {% assign ext = file.extname | downcase %}
-        {% if ext == ".md" and file.path contains "/content/" %}
-          {% assign note_title = file.name | replace: ".md", "" %}
-          <a class="note-link" href="{{ file.path | replace: '.md', '.html' | relative_url }}">
-            {{ note_title | replace: "&amp;", "&" | escape }}
-          </a>
-        {% endif %}
+      <a class="note-link{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">Home</a>
+      {% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "name" %}
+      {% for n in notes %}
+        <a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>
       {% endfor %}
     </aside>
 
     <main class="document">
+      {% if is_note %}<h1 class="note-title">{{ page_title | escape }}</h1>{% endif %}
       {{ content }}
     </main>
 
     <aside class="toc">
       <h3>On this page</h3>
-      <p class="toc-hint">Use the headings in the document to navigate.</p>
+      <nav id="toc-list"><p class="toc-hint">No headings on this page.</p></nav>
     </aside>
   </div>
+
+  <script>
+    (function () {
+      var heads = document.querySelectorAll('.document h1:not(.note-title), .document h2, .document h3');
+      var list = document.getElementById('toc-list');
+      if (!heads.length) return;
+      list.innerHTML = '';
+      heads.forEach(function (h, i) {
+        if (!h.id) h.id = 'section-' + (i + 1);
+        var a = document.createElement('a');
+        a.className = 'note-link toc-' + h.tagName.toLowerCase();
+        a.href = '#' + h.id;
+        a.textContent = h.textContent;
+        list.appendChild(a);
+      });
+    })();
+  </script>
 </body>
 </html>
