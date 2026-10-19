@@ -2,6 +2,7 @@
 share: true
 ---
 Generics introduce **type parameters**—placeholders inside diamond brackets (`<T>`) evaluated when an instance is declared
+
 ```
 // Generic Class Definition public class Box<T>{ 
 	private T value; 
@@ -28,5 +29,6 @@ Type Parameter `<T>` vs. Wildcard `<?>`
 | **Class Declarations**  | Valid: `class Box<T> { ... }`.                                                                   | **Illegal:** `class Box<?> { ... }` causes a syntax error                       |
 | **Method Declarations** | Valid: `<T> void fun(T a, T b)`.                                                                 | **Illegal:** `<> void fun(? a, ? b)` causes a syntax error                      |
 | **Primary Purpose**     | Defines flexible, reusable generic types and methods.                                            | Resolves the invariance problem to allow references across generic collections. |
+
 **Does the JVM know about Generics?** 
 **No**. Generics operate purely as a **compile-time safety mechanism** and are completely erased before execution in the JVM
