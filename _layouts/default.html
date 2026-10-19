@@ -28,6 +28,7 @@
     </main>
 
     <aside class="toc">
+      <div class="toc-resizer" role="separator" aria-orientation="vertical" aria-label="Drag to resize the note width" title="Drag to resize"></div>
       <h3>On this page</h3>
       <nav id="toc-list"><p class="toc-hint">No headings on this page.</p></nav>
     </aside>
@@ -92,16 +93,19 @@
         });
         return best;
       }
-      // A standalone embed line "![[a.png|a.png]]" is parsed as a one-row table because of the "|".
-      // Put the original text back so the embed pass below can handle it.
+      // Embed lines like "![[a.png|a.png]]" contain a "|", so kramdown turns them into table cells.
+      // Put the original text back when a whole table row is nothing but embeds.
+      var embedOnly = /^(?:!\[\[[^\]]*\]\]\s*)+$/;
       root.querySelectorAll('table').forEach(function (t) {
-        var cells = Array.prototype.map.call(t.querySelectorAll('td, th'), function (c) { return c.textContent; });
-        var joined = cells.join('|').trim();
-        if (/^!\[\[[^\]]*\]\]$/.test(joined) && t.querySelectorAll('tr').length === 1) {
-          var p = document.createElement('p');
-          p.textContent = joined;
-          t.parentNode.replaceChild(p, t);
-        }
+        var rows = Array.prototype.slice.call(t.querySelectorAll('tr'));
+        var texts = rows.map(function (r) {
+          return Array.prototype.map.call(r.querySelectorAll('td, th'), function (c) { return c.textContent; }).join('|').trim();
+        });
+        if (!texts.length || !texts.every(function (x) { return embedOnly.test(x); })) return;
+        var holder = document.createElement('div');
+        texts.forEach(function (x) { var p = document.createElement('p'); p.textContent = x; holder.appendChild(p); });
+        while (holder.firstChild) t.parentNode.insertBefore(holder.firstChild, t);
+        t.parentNode.removeChild(t);
       });
       // Obsidian embeds: ![[file.png]] or ![[file.png|alt]] (images and PDFs).
       var re = /!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/g;
@@ -256,6 +260,37 @@
         if (!hit) return;
         frag.appendChild(document.createTextNode(v.slice(last)));
         t.parentNode.replaceChild(frag, t);
+      });
+    })();
+  </script>
+  <script>
+    // Drag the line beside "On this page" to make the note column wider or narrower.
+    (function () {
+      var ws = document.querySelector('.workspace'), bar = document.querySelector('.toc-resizer');
+      if (!ws || !bar) return;
+      var KEY = 'noteWidth';
+      function limits() { return [420, Math.max(420, window.innerWidth - 230 - 80)]; }
+      function clamp(w) { var l = limits(); return Math.min(l[1], Math.max(l[0], w)); }
+      function apply(w) { document.documentElement.style.setProperty('--doc-w', clamp(w) + 'px'); }
+      try { var saved = parseInt(localStorage.getItem(KEY), 10); if (saved) apply(saved); } catch (e) {}
+      var startX, startW, dragging = false;
+      bar.addEventListener('pointerdown', function (e) {
+        dragging = true; startX = e.clientX;
+        startW = document.querySelector('.document').getBoundingClientRect().width;
+        bar.setPointerCapture(e.pointerId); document.body.classList.add('resizing'); e.preventDefault();
+      });
+      bar.addEventListener('pointermove', function (e) {
+        if (dragging) apply(startW + 2 * (e.clientX - startX));
+      });
+      function end(e) {
+        if (!dragging) return;
+        dragging = false; document.body.classList.remove('resizing');
+        try { localStorage.setItem(KEY, String(Math.round(document.querySelector('.document').getBoundingClientRect().width))); } catch (x) {}
+      }
+      bar.addEventListener('pointerup', end); bar.addEventListener('pointercancel', end);
+      bar.addEventListener('dblclick', function () {
+        document.documentElement.style.removeProperty('--doc-w');
+        try { localStorage.removeItem(KEY); } catch (x) {}
       });
     })();
   </script>
