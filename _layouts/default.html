@@ -9,6 +9,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ page_title | escape }}{% if page.url != "/" %} | {{ site.title | escape }}{% endif %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 </head>
 <body>
@@ -24,8 +25,15 @@
     <aside class="sidebar">
       <h2>All Notes</h2>
       <a class="note-link{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">Home</a>
-      {% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "name" %}
+      {% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "path" %}
+      {% assign last_group = "" %}
       {% for n in notes %}
+        {% assign parts = n.path | split: "/" %}
+        {% if parts.size > 2 %}{% assign group = parts[1] %}{% else %}{% assign group = "Other" %}{% endif %}
+        {% if group != last_group %}
+          <h3 class="note-group">{% if group.size <= 4 %}{{ group | upcase | escape }}{% else %}{{ group | capitalize | escape }}{% endif %}</h3>
+          {% assign last_group = group %}
+        {% endif %}
         <a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>
       {% endfor %}
     </aside>
@@ -40,6 +48,61 @@
       <nav id="toc-list"><p class="toc-hint">No headings on this page.</p></nav>
     </aside>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+  <script>
+    (function () {
+      var root = document.querySelector('.document');
+      if (!root || !window.katex) return;
+      var skip = 'CODE, PRE, SCRIPT, STYLE, TEXTAREA, .katex';
+
+      // 1. Notes sometimes contain LaTeX commands without $ delimiters (for example
+      //    "A \xrightarrow{k} B" or "O(V^2 \log V)"). Wrap those so they render as math.
+      var group = '(?:\\{[^{}]*(?:\\{[^{}]*\\}[^{}]*)*\\})';
+      var bare = new RegExp(
+        '(?:O\\((?:[^()]|\\([^()]*\\))*\\\\[a-zA-Z]+(?:[^()]|\\([^()]*\\))*\\))' +
+        '|(?:\\b[A-Za-z0-9]+\\s*\\\\(?:xrightarrow|to)\\b' + group + '?\\s*[A-Za-z0-9]+\\b)' +
+        '|(?:\\\\[a-zA-Z]+' + group + '*(?:\\((?:[^()]|\\([^()]*\\))*\\))?)', 'g');
+      var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (n) {
+          if (n.parentNode.closest(skip)) return NodeFilter.FILTER_REJECT;
+          return n.nodeValue.indexOf('\\') > -1 && n.nodeValue.indexOf('$') === -1
+            ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        }
+      });
+      var nodes = [], n;
+      while ((n = walker.nextNode())) nodes.push(n);
+      nodes.forEach(function (node) {
+        var text = node.nodeValue;
+        if (!bare.test(text)) { bare.lastIndex = 0; return; }
+        bare.lastIndex = 0;
+        var frag = document.createDocumentFragment(), last = 0, m;
+        while ((m = bare.exec(text))) {
+          frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+          var span = document.createElement('span');
+          try { katex.render(m[0], span, { throwOnError: true }); }
+          catch (e) { span.textContent = m[0]; }
+          frag.appendChild(span);
+          last = m.index + m[0].length;
+        }
+        frag.appendChild(document.createTextNode(text.slice(last)));
+        node.parentNode.replaceChild(frag, node);
+      });
+
+      // 2. Delimited math: $...$, $$...$$, \(...\), \[...\].
+      renderMathInElement(root, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false },
+          { left: '$', right: '$', display: false }
+        ],
+        ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+        throwOnError: false
+      });
+    })();
+  </script>
 
   <script>
     (function () {
