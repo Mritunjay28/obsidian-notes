@@ -203,3 +203,11 @@ a:hover, .note-link.active {
   .menu { position: static; }
   .menu-list { left: 0; right: 0; top: 100%; border-radius: 0; min-width: 0; }
 }
+
+/* Home page: centered note list */
+.home { text-align: center; max-width: 720px; margin: 0 auto; }
+.home h1 { margin-bottom: 8px; }
+.home h2 { border-bottom: 0; margin-top: 36px; }
+.home-list { list-style: none; padding: 0; margin: 0; }
+.home-list li { padding: 5px 0; }
+.topbar { padding-left: 24px; }
