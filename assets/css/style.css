@@ -275,7 +275,8 @@ a.card .count { color: var(--muted); font-size: 0.9rem; }
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.55);
   text-align: left;
 }
-a.card:hover .preview, a.card:focus-within .preview { display: block; }
+a.card.show-preview { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4); color: inherit; }
+a.card:hover .preview, a.card:focus-within .preview, a.card.show-preview .preview { display: block; }
 .card .preview .psub {
   margin: 10px 0 3px;
   font-size: 0.72rem;
