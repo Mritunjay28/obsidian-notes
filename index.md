@@ -1,4 +1,3 @@
-
 ---
 layout: default
 title: Home
@@ -9,6 +8,8 @@ title: Home
 Welcome to my public knowledge base.
 
 ## All Notes
-{: #all-notes }
 
-Select any note from the left sidebar to read it here.
+{% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "name" %}
+{% for n in notes %}
+- [{{ n.name | remove: ".md" }}]({{ n.url | relative_url }})
+{% endfor %}
