@@ -15,7 +15,6 @@
 <body>
   {% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "path" %}
   <header class="topbar">
-    <a class="brand" href="{{ '/' | relative_url }}">{{ site.title | escape }}</a>
     <nav class="main-nav" aria-label="Main navigation">
       <a class="nav-home{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">Home</a>
       {% assign last_group = "" %}
