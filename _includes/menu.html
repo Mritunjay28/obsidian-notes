@@ -1,0 +1,34 @@
+{% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "path" %}
+{% assign has = "" %}
+{% for n in notes %}
+  {% assign parts = n.path | split: "/" %}
+  {% if parts.size > 2 %}
+    {% assign group = parts[1] %}
+    {% assign sub = "" %}
+    {% if parts.size > 3 %}{% assign sub_index = parts.size | minus: 2 %}{% assign sub = parts[sub_index] %}{% endif %}
+    {% if sub == "SQL" %}{% assign group = "SQL" %}{% endif %}
+    {% if group == include.g %}{% assign has = "1" %}{% break %}{% endif %}
+  {% endif %}
+{% endfor %}
+{% if has != "" %}
+<div class="menu"><button type="button" class="menu-btn" aria-expanded="false">{{ include.g | escape }} <span class="caret">&#9662;</span></button><div class="menu-list">
+{% assign last_sub = "__none__" %}
+{% for n in notes %}
+  {% assign parts = n.path | split: "/" %}
+  {% if parts.size > 2 %}
+    {% assign group = parts[1] %}
+    {% assign sub = "" %}
+    {% if parts.size > 3 %}{% assign sub_index = parts.size | minus: 2 %}{% assign sub = parts[sub_index] %}{% endif %}
+    {% if sub == "SQL" %}{% assign group = "SQL" %}{% assign sub = "" %}{% endif %}
+    {% assign sub_l = sub | downcase %}{% assign group_l = group | downcase %}{% if sub_l == group_l %}{% assign sub = "" %}{% endif %}
+    {% if group == include.g %}
+      {% if sub != last_sub %}
+        {% if sub != "" %}<span class="menu-sub">{{ sub | remove_first: include.g | strip | escape }}</span>{% endif %}
+        {% assign last_sub = sub %}
+      {% endif %}
+      <a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>
+    {% endif %}
+  {% endif %}
+{% endfor %}
+</div></div>
+{% endif %}
