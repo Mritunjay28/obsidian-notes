@@ -20,7 +20,9 @@ share: true
 | `static` method           | Can be called without object                    |
 | `static` block            | Runs once when class is loaded (initialization) |
 | `static` class (inner)    | Can be created without outer class instance     |
+
 eg:
+
 ```
 Static Variables (Fields) :
 class Student {
