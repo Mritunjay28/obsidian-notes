@@ -17,40 +17,11 @@
   <header class="topbar">
     <nav class="main-nav" aria-label="Main navigation">
       <a class="nav-home{% if page.url == '/' %} active{% endif %}" href="{{ '/' | relative_url }}">Home</a>
-      {% assign last_group = "" %}
-      {% assign last_sub = "" %}
-      {% for n in notes %}
-        {% assign parts = n.path | split: "/" %}
-        {% if parts.size > 2 %}
-          {% assign group = parts[1] %}
-          {% assign sub = "" %}
-          {% if parts.size > 3 %}{% assign sub_index = parts.size | minus: 2 %}{% assign sub = parts[sub_index] %}{% endif %}
-          {% if sub == "SQL" %}{% assign group = "SQL" %}{% assign sub = "" %}{% endif %}{% if sub == group %}{% assign sub = "" %}{% endif %}
-          {% if group != last_group %}
-            {% if last_group != "" %}</div></div>{% endif %}
-            <div class="menu"><button type="button" class="menu-btn" aria-expanded="false">{% if group.size <= 4 %}{{ group | upcase | escape }}{% else %}{{ group | capitalize | escape }}{% endif %} <span class="caret">&#9662;</span></button><div class="menu-list">
-            {% assign last_group = group %}
-            {% assign last_sub = "" %}
-          {% endif %}
-          {% if sub != last_sub %}
-            {% if sub != "" %}<span class="menu-sub">{{ sub | escape }}</span>{% endif %}
-            {% assign last_sub = sub %}
-          {% endif %}
-          <a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>
-        {% endif %}
-      {% endfor %}
-      {% if last_group != "" %}</div></div>{% endif %}
-      {% assign other_count = 0 %}
-      {% for n in notes %}{% assign parts = n.path | split: "/" %}{% if parts.size == 2 %}{% assign other_count = other_count | plus: 1 %}{% endif %}{% endfor %}
-      {% if other_count > 0 %}
-        <div class="menu"><button type="button" class="menu-btn" aria-expanded="false">Others <span class="caret">&#9662;</span></button><div class="menu-list">
-          {% for n in notes %}{% assign parts = n.path | split: "/" %}{% if parts.size == 2 %}<a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>{% endif %}{% endfor %}
-        </div></div>
-      {% endif %}
+      {% include menus.html %}
     </nav>
   </header>
 
-  <div class="workspace{% if page.url == '/' %} is-home{% endif %}">
+  <div class="workspace{% if page.url == '/' or page.bare %} is-home{% endif %}">
     <main class="document">
       {% if is_note %}<h1 class="note-title">{{ page_title | escape }}</h1>{% endif %}
       {{ content }}
