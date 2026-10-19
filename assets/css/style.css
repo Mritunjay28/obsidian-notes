@@ -214,3 +214,17 @@ a:hover, .note-link.active {
 
 .workspace.is-home { grid-template-columns: minmax(0, 1fr); }
 .workspace.is-home .toc { display: none; }
+
+.document img { display: block; margin: 12px 0; }
+.embed-missing { color: #e0a35a; font-style: italic; }
+
+.menu-sub {
+  display: block;
+  margin: 10px 0 2px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.menu-sub:first-child { margin-top: 2px; }
+.home-sub { margin: 22px 0 6px; font-size: 1.05rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
