@@ -1,0 +1,16 @@
+
+title: My Obsidian Notes
+description: My public knowledge base
+url: "https://Mritunjay28.github.io"
+baseurl: "/obsidian-notes"
+
+theme: minima
+markdown: kramdown
+
+include:
+  - content
+
+collections:
+  notes:
+    output: true
+    permalink: /notes/:path/
