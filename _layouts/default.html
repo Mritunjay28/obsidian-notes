@@ -1,52 +1,59 @@
 
+---
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ page.title | default: site.title }}</title>
+  <title>{{ page.title | default: site.title | escape }}</title>
   <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 </head>
 <body>
   <header class="topbar">
     <a class="brand" href="{{ '/' | relative_url }}">
-      {{ site.title }}
+      {{ site.title | escape }}
     </a>
-    <nav>
-      <a href="{{ '/content/' | relative_url }}">DSA</a>
-      <a href="{{ '/content/' | relative_url }}">ML</a>
-      <a href="{{ '/content/' | relative_url }}">System Design</a>
-      <a href="{{ '/content/' | relative_url }}">Research</a>
+    <nav aria-label="Main navigation">
+      <a href="{{ '/' | relative_url }}">Home</a>
+      <a href="{{ '/#all-notes' | relative_url }}">DSA / All Notes</a>
     </nav>
   </header>
 
   <div class="workspace">
     <aside class="sidebar">
-      <h2>All Posts</h2>
+      <h2>All Notes</h2>
+
+      <a class="note-link" href="{{ '/' | relative_url }}">Home</a>
+
       {% assign notes = site.pages | sort: "title" %}
       {% for note in notes %}
-        {% if note.title and note.url != "/" %}
+        {% if note.title and note.url != "/" and note.url != "/404.html" %}
           <a class="note-link" href="{{ note.url | relative_url }}">
-            {{ note.title }}
+            {{ note.title | escape }}
+          </a>
+        {% endif %}
+      {% endfor %}
+
+      {% assign files = site.static_files | sort: "name" %}
+      {% for file in files %}
+        {% assign ext = file.extname | downcase %}
+        {% if ext == ".md" and file.path contains "/content/" %}
+          {% assign note_title = file.name | replace: ".md", "" %}
+          <a class="note-link" href="{{ file.path | replace: '.md', '.html' | relative_url }}">
+            {{ note_title | replace: "&amp;", "&" | escape }}
           </a>
         {% endif %}
       {% endfor %}
     </aside>
 
     <main class="document">
-      <h1>{{ page.title | default: site.title }}</h1>
       {{ content }}
     </main>
 
     <aside class="toc">
       <h3>On this page</h3>
-      {% if page.toc %}
-        {% for item in page.toc %}
-          <a href="#{{ item.id }}">{{ item.title }}</a>
-        {% endfor %}
-      {% else %}
-        <p>Page sections</p>
-      {% endif %}
+      <p class="toc-hint">Use the headings in the document to navigate.</p>
     </aside>
   </div>
 </body>
