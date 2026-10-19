@@ -6,8 +6,16 @@ title: Home
 
 # My Obsidian Notes
 
-Welcome to my personal knowledge base.
+Welcome to my public knowledge base.
 
-## Browse my notes
+## All notes
 
-- [Test Publish](content/Test%20Publish)
+<ul>
+{% assign notes = site.static_files | where_exp: "file", "file.path contains '/content/'" | sort: "name" %}
+{% for note in notes %}
+{% assign extension = note.extname | downcase %}
+{% if extension == ".md" %}
+<li><a href="{{ note.path | relative_url | replace: '.md', '.html' }}">{{ note.name | replace: '.md', '' | escape }}</a></li>
+{% endif %}
+{% endfor %}
+</ul>
