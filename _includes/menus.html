@@ -1,0 +1,28 @@
+{% assign notes = site.pages | where_exp: "p", "p.path contains 'content/'" | sort: "path" %}
+{% assign group_order = "DSA,OOPs,DBMS,SQL,System Design" | split: "," %}
+{% assign seen = "|" %}
+{% for g in group_order %}
+  {% assign seen = seen | append: g | append: "|" %}
+  {% include menu.html g=g %}
+{% endfor %}
+{% for n in notes %}
+  {% assign parts = n.path | split: "/" %}
+  {% if parts.size > 2 %}
+    {% assign group = parts[1] %}
+    {% assign sub = "" %}
+    {% if parts.size > 3 %}{% assign sub_index = parts.size | minus: 2 %}{% assign sub = parts[sub_index] %}{% endif %}
+    {% if sub == "SQL" %}{% assign group = "SQL" %}{% endif %}
+    {% assign key = "|" | append: group | append: "|" %}
+    {% unless seen contains key %}
+      {% assign seen = seen | append: group | append: "|" %}
+      {% include menu.html g=group %}
+    {% endunless %}
+  {% endif %}
+{% endfor %}
+{% assign other_count = 0 %}
+{% for n in notes %}{% assign parts = n.path | split: "/" %}{% if parts.size == 2 %}{% assign other_count = other_count | plus: 1 %}{% endif %}{% endfor %}
+{% if other_count > 0 %}
+<div class="menu"><button type="button" class="menu-btn" aria-expanded="false">Others <span class="caret">&#9662;</span></button><div class="menu-list">
+  {% for n in notes %}{% assign parts = n.path | split: "/" %}{% if parts.size == 2 %}<a class="note-link{% if n.url == page.url %} active{% endif %}" href="{{ n.url | relative_url }}">{{ n.name | remove: ".md" | escape }}</a>{% endif %}{% endfor %}
+</div></div>
+{% endif %}
