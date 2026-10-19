@@ -228,3 +228,5 @@ a:hover, .note-link.active {
 }
 .menu-sub:first-child { margin-top: 2px; }
 .home-sub { margin: 22px 0 6px; font-size: 1.05rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+.document mark { background: #5c4b00; color: #ffe27a; padding: 0 3px; border-radius: 3px; }
