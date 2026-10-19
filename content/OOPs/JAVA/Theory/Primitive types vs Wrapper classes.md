@@ -25,6 +25,7 @@ Java 8 primitive type
 | `double`       | 8 bytes | `double d = 2.71`  | `Double`      |
 | `char`         | 2 bytes | `char c = 'A'`     | `Character`   |
 | `boolean`      | 1 bit   | `boolean b = true` | `Boolean`     |
+
 ### Feature :
 i) Autoboxing and Unboxing : Java **automatically converts** between primitive ↔ wrapper as needed
 ```
