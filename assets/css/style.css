@@ -211,3 +211,6 @@ a:hover, .note-link.active {
 .home-list { list-style: none; padding: 0; margin: 0; }
 .home-list li { padding: 5px 0; }
 .topbar { padding-left: 24px; }
+
+.workspace.is-home { grid-template-columns: minmax(0, 1fr); }
+.workspace.is-home .toc { display: none; }
