@@ -61,3 +61,189 @@ share: true
     - `signalAll()` $\rightarrow$ `notifyAll()`
 - **Key Advantage (Multiple Wait-Sets)**: Allows creating multiple distinct `Condition` instances on a single lock (e.g., `notFull` and `notEmpty` queues in a Producer-Consumer buffer). This targets wake-ups precisely to specific thread types and eliminates cross-wakeup issues.
 - Must always be invoked within a `while` loop (Guarded Block) to protect against **spurious wakeups**.
+
+### **1. `ReentrantLock`**
+
+```
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class ReentrantLockDemo {
+    private final Lock lock = new ReentrantLock();
+
+    public void performTask() {
+        lock.lock(); // Acquire lock
+        try {
+            System.out.println(Thread.currentThread().getName() + " acquired lock.");
+        } finally {
+            lock.unlock(); // Always release lock in finally block
+        }
+    }
+
+    public void tryPerformTask() {
+        if (lock.tryLock()) { // Non-blocking lock attempt
+            try {
+                System.out.println("Lock acquired via tryLock().");
+            } finally {
+                lock.unlock();
+            }
+        } else {
+            System.out.println("Lock busy, executing alternative path.");
+        }
+    }
+}
+
+```
+
+---
+
+### **2. `ReentrantReadWriteLock`**
+
+```
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+public class ReadWriteLockDemo {
+    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private int sharedData = 0;
+
+    // Shared lock allowing concurrent readers
+    public int readData() {
+        rwLock.readLock().lock();
+        try {
+            return sharedData;
+        } finally {
+            rwLock.readLock().unlock();
+        }
+    }
+
+    // Exclusive lock allowing only one writer at a time
+    public void writeData(int value) {
+        rwLock.writeLock().lock();
+        try {
+            this.sharedData = value;
+        } finally {
+            rwLock.writeLock().unlock();
+        }
+    }
+}
+
+```
+
+---
+
+### **3. `StampedLock`**
+
+```
+import java.util.concurrent.locks.StampedLock;
+
+public class StampedLockDemo {
+    private final StampedLock lock = new StampedLock();
+    private int data = 42;
+
+    // Optimistic reading without acquiring a pessimistic lock
+    public int readDataOptimistic() {
+        long stamp = lock.tryOptimisticRead();
+        int currentData = this.data;
+
+        // Fall back to pessimistic read lock if data was modified during read
+        if (!lock.validate(stamp)) {
+            stamp = lock.readLock();
+            try {
+                currentData = this.data;
+            } finally {
+                lock.unlockRead(stamp);
+            }
+        }
+        return currentData;
+    }
+
+    // Exclusive write lock
+    public void writeData(int newData) {
+        long stamp = lock.writeLock();
+        try {
+            this.data = newData;
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+    }
+}
+
+```
+
+---
+
+### **4. `Semaphore`**
+
+```
+import java.util.concurrent.Semaphore;
+
+public class SemaphoreDemo {
+    // Limits concurrent access to a maximum of 3 threads
+    private final Semaphore semaphore = new Semaphore(3);
+
+    public void accessResource() {
+        try {
+            semaphore.acquire(); // Decrements available permit count
+            System.out.println(Thread.currentThread().getName() + " acquired permit.");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            semaphore.release(); // Increments available permit count
+        }
+    }
+}
+
+```
+
+---
+
+### **5. `Condition`**
+
+```
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class BoundedBuffer {
+    private final Lock lock = new ReentrantLock();
+    private final Condition notFull  = lock.newCondition(); // Producer wait-queue
+    private final Condition notEmpty = lock.newCondition(); // Consumer wait-queue
+
+    private final Object[] items = new Object[10];
+    private int count, putptr, takeptr;
+
+    public void put(Object x) throws InterruptedException {
+        lock.lock();
+        try {
+            while (count == items.length) {
+                notFull.await(); // Producer waits until space opens up
+            }
+            items[putptr] = x;
+            if (++putptr == items.length) putptr = 0;
+            ++count;
+
+            notEmpty.signal(); // Signal consumer that an item is available
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public Object take() throws InterruptedException {
+        lock.lock();
+        try {
+            while (count == 0) {
+                notEmpty.await(); // Consumer waits until item is produced
+            }
+            Object x = items[takeptr];
+            if (++takeptr == items.length) takeptr = 0;
+            --count;
+
+            notFull.signal(); // Signal producer that buffer has space
+            return x;
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+```
