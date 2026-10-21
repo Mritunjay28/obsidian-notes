@@ -37,6 +37,8 @@ share: true
 	f. Logical schema is most important in terms of its effect on application programs, as programmers construct apps by using logical schema.
 	g. Physical data independence, physical schema change should not affect logical
 	schema/application programs.
+	==🟠h. _Physical Data Independence:_ Changing storage (e.g., HDD to SSD, changing B+ tree block size) without altering the Logical Schema.==
+	==🟠i. _Logical Data Independence:_ Adding a new column or splitting a table without breaking existing External Views (harder to achieve).==
 
 3. Data Models:
 	a. Provides a way to describe the design of a DB at logical level.
