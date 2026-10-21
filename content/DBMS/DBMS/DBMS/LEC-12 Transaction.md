@@ -7,18 +7,18 @@ LEC-12: Transaction
 	1. A unit of work done against the DB in a logical sequence.
 	2. Sequence is very important in transaction.
 	3. It is a logical unit of work that contains one or more SQL statements. The result of all these statements in a transaction either gets completed successfully (all the changes made to the database are permanent) or if at any point any failure happens it gets rollbacked (all the changes being done are undone.)
-2. ACID Properties
-	1. To ensure integrity of the data, we require that the DB system maintain the following properties of the transaction.
-	2. Atomicity
-		1. Either all operations of transaction are reflected properly in the DB, or none are.
-	3. Consistency
-		1. Integrity constraints must be maintained before and after transaction.
-		2. DB must be consistent after transaction happens.
-	4. Isolation
-		1. Even though multiple transactions may execute concurrently, the system guarantees that, for every pair of transactions Ti and Tj, it appears to Ti that either Tj finished execution before Ti started, or Tj started execution after Ti finished. Thus, each transaction is unaware of other transactions executing concurrently in the system.
-		2. Multiple transactions can happen in the system in isolation, without interfering each other.
-	5. Durability
-		1. After transaction completes successfully, the changes it has made to the database persist, even if there are system failures.
+2. ==🟠ACID Properties==
+	1. ==🟠To ensure integrity of the data, we require that the DB system maintain the following properties of the transaction.==
+	2. ==🟠Atomicity==
+		1. ==🟠Either all operations of transaction are reflected properly in the DB, or none are.==
+	3. ==🟠Consistency==
+		1. ==🟠Integrity constraints must be maintained before and after transaction.==
+		2. ==🟠DB must be consistent after transaction happens.==
+	4. ==🟠Isolation==
+		1. ==🟠Even though multiple transactions may execute concurrently, the system guarantees that, for every pair of transactions Ti and Tj, it appears to Ti that either Tj finished execution before Ti started, or Tj started execution after Ti finished. Thus, each transaction is unaware of other transactions executing concurrently in the system.==
+		2. ==🟠Multiple transactions can happen in the system in isolation, without interfering each other.==
+	5. ==🟠Durability==
+		1. ==🟠After transaction completes successfully, the changes it has made to the database persist, even if there are system failures.==
 3. Transaction states
 	1. ![[Pasted image 20260521103936.png|Pasted image 20260521103936.png]]
 	2. Active state
