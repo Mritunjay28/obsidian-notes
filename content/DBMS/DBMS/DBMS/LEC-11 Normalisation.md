@@ -66,3 +66,17 @@ share: true
 	1. Normalisation helps to minimise data redundancy.
 	2. Greater overall database organisation.
 	3. Data consistency is maintained in DB.
+30. 
+
+|**Normal Form**|**Core Rule**|**What It Eliminates**|**Formal Condition (for every non-trivial α→β)**|
+|---|---|---|---|
+|**1NF**|Atomic values only|Multi-valued & composite attributes|No arrays, JSON blobs, or comma-separated strings in a cell.|
+|**2NF**|1NF + No **Partial Dependency**|Redundancy from composite keys|No non-prime attribute depends on a _proper subset_ of a Candidate Key. (Note: If all CKs are single-column, a 1NF table is _automatically_ in 2NF).|
+|**3NF**|2NF + No **Transitive Dependency**|Non-key determining another non-key|Either $\alpha$ is a Super Key **OR** $\beta$ is a Prime Attribute.|
+|**BCNF**|Stricter 3NF|Prime attribute depending on non-superkey|$\alpha$ **MUST** be a Super Key. Zero exceptions.|
+
+31. **Decomposition Properties (Crucial for OA MCQs):**
+    -  When splitting a table $R$ into $R_1$ and $R_2$:
+    - **Lossless Join (Mandatory):** Joining $R_1 \bowtie R_2$ must yield exact original rows without generating spurious (fake) tuples. _Condition:_ $(R_1 \cap R_2) \rightarrow R_1$ **OR** $(R_1 \cap R_2) \rightarrow R_2$ (the common attribute must be a Super Key of at least one decomposed table).
+    - **Dependency Preserving:** All original FDs can be verified without joining $R_1$ and $R_2$.
+    - _The Golden Rule:_ **3NF** guarantees _both_ Lossless Join and Dependency Preservation. **BCNF** guarantees Lossless Join, but **may NOT preserve dependencies**.
