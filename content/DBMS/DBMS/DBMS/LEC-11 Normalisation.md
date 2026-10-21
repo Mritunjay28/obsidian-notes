@@ -20,6 +20,10 @@ share: true
 		3. Transitivity
 			1. If A determines B and B determines C, we can say that A determines C.
 			2. if A→ B and B→ C then A→ C.
+	5. ==🟠Let $\alpha \rightarrow \beta$ be a Functional Dependency (FD), meaning if two rows have the same value for $\alpha$, they must have the same value for $\beta$.==
+		- ==🟠**Prime Attribute:** Any attribute that is part of _any_ Candidate Key.==
+		- ==🟠**Non-Prime Attribute:** Any attribute not part of _any_ Candidate Key.==
+		- ==🟠**Trivial FD:** $\alpha \rightarrow \beta$ is trivial if $\beta \subseteq \alpha$ (e.g., `{id, name} -> {id}`). Always holds true.==
 
 20. Why Normalisation?
 	1. To avoid redundancy in the DB, not to store redundant data.
