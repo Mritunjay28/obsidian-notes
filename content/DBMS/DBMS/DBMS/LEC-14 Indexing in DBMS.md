@@ -48,9 +48,9 @@ share: true
 11. Limitations of Indexing
 	1. Additional space to store index table
 	2. Indexing Decrease performance in INSERT, DELETE, and UPDATE query.
-12. **B-Tree vs. B+ Tree:**
-	1. **B-Tree:** Stores both keys and actual data pointers (or row payloads) in internal _and_ leaf nodes.
-	2. **B+ Tree (Standard in DBs):**
-	    1. Internal nodes store _only_ routing keys (no data payloads). Because internal nodes are tiny, a high **fan-out** (branching factor) fits in a single 16KB RAM/Disk page, keeping tree height tiny (typically height 3–4 holds millions of rows).
-	    2. All data pointers live exclusively in the **Leaf Nodes**.
-	    3. Leaf nodes are connected as a **Doubly Linked List**, making range queries (`WHERE age BETWEEN 20 AND 30` or `ORDER BY`) a single $O(\log N)$ point lookup followed by sequential linear traversal.
+12. ==🟠**B-Tree vs. B+ Tree:**==
+	1. ==🟠**B-Tree:** Stores both keys and actual data pointers (or row payloads) in internal _and_ leaf nodes.==
+	2. ==🟠**B+ Tree (Standard in DBs):**==
+	    1. ==🟠Internal nodes store _only_ routing keys (no data payloads). Because internal nodes are tiny, a high **fan-out** (branching factor) fits in a single 16KB RAM/Disk page, keeping tree height tiny (typically height 3–4 holds millions of rows).==
+	    2. ==🟠All data pointers live exclusively in the **Leaf Nodes**.==
+	    3. ==🟠Leaf nodes are connected as a **Doubly Linked List**, making range queries (`WHERE age BETWEEN 20 AND 30` or `ORDER BY`) a single $O(\log N)$ point lookup followed by sequential linear traversal.==
