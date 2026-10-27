@@ -51,13 +51,13 @@ Data can be recorded and doesn’t have any meaning unless processed.
 	b. A DBMS is the database itself, along with all the software and functionality. It is used to perform different operations, like addition, access, updating, and deletion of the data.
 
 
-7. DBMS vs File Systems
-	a. File-processing systems has major disadvantages.
-		i. Data Redundancy and inconsistency
-		ii. Difficulty in accessing data
-		iii. Data isolation
-		iv. Integrity problems
-		v. Atomicity problems
-		vi. Concurrent-access anomalies
-		vii. Security problems
-	b. Above 7 are also the Advantages of DBMS (answer to “Why to use DBMS?”)
+7. ==🟠DBMS vs File Systems==
+	==🟠a. File-processing systems has major disadvantages.==
+		==🟠i. Data Redundancy and inconsistency==
+		==🟠ii. Difficulty in accessing data==
+		==🟠iii. Data isolation==
+		==🟠iv. Integrity problems==
+		==🟠v. Atomicity problems==
+		==🟠vi. Concurrent-access anomalies==
+		==🟠vii. Security problems==
+	==🟠b. Above 7 are also the Advantages of DBMS (answer to “Why to use DBMS?”)==
