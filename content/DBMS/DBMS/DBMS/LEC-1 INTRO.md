@@ -61,3 +61,5 @@ Data can be recorded and doesn’t have any meaning unless processed.
 		==🟠vi. Concurrent-access anomalies==
 		==🟠vii. Security problems==
 	==🟠b. Above 7 are also the Advantages of DBMS (answer to “Why to use DBMS?”)==
+
+![[DBMS Complete.pdf|DBMS Complete.pdf]]
